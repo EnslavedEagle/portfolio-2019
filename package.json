@@ -1,0 +1,31 @@
+{
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "browser-sync": "^2.26.3",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-cached": "^1.1.1",
+    "gulp-csso": "^3.0.1",
+    "gulp-imagemin": "^5.0.3",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^8.0.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.1",
+    "gulp-zip": "^4.2.0",
+    "imagemin-jpeg-recompress": "^6.0.0",
+    "imagemin-pngquant": "^7.0.0",
+    "node-sass": "^4.11.0",
+    "postcss-uncss": "^0.16.1",
+    "pump": "^3.0.0",
+    "through2": "^3.0.0",
+    "uncss": "^0.16.2",
+    "vinyl-named": "^1.1.0",
+    "webpack": "^4.16.5",
+    "webpack-stream": "^5.1.1"
+  }
+}

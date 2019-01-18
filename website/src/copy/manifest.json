@@ -1,0 +1,39 @@
+{
+  "name": "Patryk Bernasiewicz | Front-End Developer",
+  "short_name": "PatrykB.pl",
+  "start_url": "/",
+  "display": "browser",
+  "theme_color": "#33acb3",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "images/icons/pb-logo.svg",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "images/icons/pb-logo-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "images/icons/pb-logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "images/icons/pb-logo-96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "images/icons/pb-logo-72.png",
+      "type": "image/png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "images/icons/pb-logo-48.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    }
+  ]
+}
