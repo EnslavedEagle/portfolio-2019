@@ -1,4 +1,4 @@
 module.exports = {
-  main: './website/src/js/main.js',
-  sw: './website/src/js/sw.js'
+  main: './src/assets/js/main.js',
+  sw: './src/assets/js/sw.js'
 }

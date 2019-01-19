@@ -19,7 +19,7 @@ const gulpBabel = require('gulp-babel');
 const gulpImagemin = require('gulp-imagemin');
 const imageminPngquant = require('imagemin-pngquant');
 const imageminJpegRecompress = require('imagemin-jpeg-recompress');
-const server = require('./lib/server');
+const nodemon = require('gulp-nodemon');
 
 
 const finish = (done) => (error) => {
@@ -45,22 +45,32 @@ const autoprefixConfig = { browsers: supportedBrowsers, cascade: false };
 const babelConfig = { targets: { browsers: supportedBrowsers } };
 
 // Paths for reuse
-const exportPath = './website/dist/**/*';
+const exportPath = './static/**/*';
 const srcPath = (file, watch = false) => {
-  if (file === 'scss' && watch === false) return './website/src/scss/style.scss';
-  if (file === 'scss' && watch === true) return './website/src/scss/**/*.scss';
+  if (file === 'scss' && watch === false) return './src/assets/scss/style.scss';
+  if (file === 'scss' && watch === true) return './src/assets/scss/**/*.scss';
   if (file === 'js' && watch === false) return entryArray;
-  if (file === 'js' && watch === true) return './website/src/js/**/*.js';
-  if (file === 'img') return './website/src/images/**/*.{png,jpeg,jpg,svg,gif}';
-  if (file === 'copy') return './website/src/copy/**/*';
-  return './website/src/copy/**/*';
+  if (file === 'js' && watch === true) return './src/assets/js/**/*.js';
+  if (file === 'img') return './src/assets/images/**/*.{png,jpeg,jpg,svg,gif}';
+  if (file === 'misc') return './src/assets/misc/**/*';
+  return './src/assets/misc/**/*';
 };
-const distPath = (file, serve = false, comment = false) => {
-  if (['css', 'js'].includes(file)) return `./website/dist/${file}`;
-  if (file === 'img') return './website/dist/images';
-  if (file === 'html') return './website/dist/**/*.html';
-  if (file === 'copy') return './website/dist';
-  return './website/dist/';
+const distPath = (file, all = false) => {
+  if (['css', 'js'].includes(file)) return `./dist/static/${file}`;
+  if (file === 'img') return './dist/static/images';
+  if (file === 'misc') {
+    if (all) {
+      return [
+        './dist/static/**/*',
+        '!./dist/static/images', '!./dist/static/images/**.*',
+        '!./dist/static/css', '!./dist/static/css/**.*',
+        '!./dist/static/js', '!./dist/static/js/**.*'
+      ];
+    } else {
+      return './dist/static';
+    }
+  }
+  return './dist/static/';
 };
 
 /**
@@ -69,13 +79,7 @@ const distPath = (file, serve = false, comment = false) => {
 
 // Clean Markup Task
 const cleanMisc = (mode) => () => {
-  const cleanTarget = [
-    `${distPath('copy')}/**/*`,
-    '!./website/dist/css', '!./website/dist/css/**',
-    '!./website/dist/images', '!./website/dist/images/**',
-    '!./website/dist/js', '!./website/dist/js/**',
-  ];
-  return ['development', 'production'].includes(mode) ? del(cleanTarget) : undefined;
+  return ['development', 'production'].includes(mode) ? del([...distPath('misc', true)]) : undefined;
 };
 
 // Clean Images Task
@@ -105,8 +109,8 @@ const cleanExport = (mode) => () => {
 // Build Misc Tasks
 const buildMisc = (mode) => (done) => {
   ['development', 'production'].includes(mode) ? pump([
-    gulp.src(srcPath('copy')),
-    gulp.dest(distPath('copy')),
+    gulp.src(srcPath('misc')),
+    gulp.dest(distPath('misc')),
     browserSync.stream()
   ], finish(done)) : undefined;
 };
@@ -175,6 +179,41 @@ const buildScripts = (mode) => (done) => {
   ], finish(done)) : undefined;
 };
 
+
+const serverIgnores = [
+  'gulpfile.js',
+  '*.json',
+  'src/assets/**/*',
+  'dist/**/*',
+  'node_modules/**/*',
+  'config/**/*'
+];
+const startServer = (mode) => (done) => {
+  nodemon({
+    script: 'app.js',
+    ext: 'js json mst',
+    ignore: serverIgnores,
+  })
+    .on('start', () => {
+      console.log('[App] Nodemon started the App.');
+    })
+    .on('crash', (err) => {
+      console.error('[App] App Server error: ', err);
+    })
+    .on('restart', () => {
+      console.log('[App] App restarted.');
+      setTimeout(function reload() {
+        browserSync.reload({
+          stream: false
+        });
+      }, 2000);
+    })
+    .on('close', () => {
+      console.log('[App] App closed.');
+    });
+  done();
+};
+
 /**
  * Generic Task for all Main Gulp Build/Export Tasks
 */
@@ -185,13 +224,10 @@ const genericTask = (mode, context = 'building') => {
   let modeName;
 
   if (mode === 'development') {
-    port = '3000';
     modeName = 'Development Mode';
   } else if (mode === 'production') {
-    port = '8000';
     modeName = 'Production Mode';
   } else {
-    port = undefined;
     modeName = undefined;
   }
 
@@ -209,11 +245,14 @@ const genericTask = (mode, context = 'building') => {
 
   // Browser Loading & Watching
   const browserLoadingWatching = (done) => {
-    server.start();
-    browserSync.init({ port, proxy: `127.0.0.1:${server.port}` });
+    browserSync.init({
+      port: 8006,
+      proxy: 'localhost:8005',
+      browser: 'chrome'
+    });
 
     // Watch - Misc
-    gulp.watch(srcPath('copy'), true)
+    gulp.watch(srcPath('misc'), true)
       .on('all', gulp.series(
         Object.assign(cleanMisc(mode), { displayName: `Watching Misc Task: Clean - ${modeName}` }),
         Object.assign(buildMisc(mode), { displayName: `Watching Misc Task: Build - ${modeName}` }),
@@ -239,6 +278,8 @@ const genericTask = (mode, context = 'building') => {
         Object.assign(cleanScripts(mode), { displayName: `Watching Scripts Task: Clean - ${modeName}` }),
         Object.assign(buildScripts(mode), { displayName: `Watching Scripts Task: Build - ${modeName}` }),
       ), browserSync.reload);
+
+    done();
   };
   
   // Exporting Zip
@@ -271,6 +312,7 @@ const genericTask = (mode, context = 'building') => {
   return undefined;
 };
 
+
 /**
  * Main Gulp Build/Export Tasks that are inserted within `package.json`
 */
@@ -279,7 +321,10 @@ const genericTask = (mode, context = 'building') => {
 gulp.task('default', gulp.series(...genericTask('production', 'building')));
 
 // Dev (`npm run dev` or `yarn run dev`) => Development
-gulp.task('dev', gulp.series(...genericTask('development', 'building')));
+gulp.task('dev', gulp.parallel(
+  startServer('development'),
+  gulp.series(...genericTask('development', 'building'))
+));
 
 // Export (`npm run export` or `yarn run export`)
 gulp.task('export', gulp.series(...genericTask('production', 'exporting')));
