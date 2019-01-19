@@ -7,7 +7,6 @@ const del = require('del');
 const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
 const browserSync = require('browser-sync').create();
-const vinylNamed = require('vinyl-named');
 const through2 = require('through2');
 const gulpZip = require('gulp-zip');
 const gulpUglify = require('gulp-uglify');
@@ -20,6 +19,17 @@ const gulpBabel = require('gulp-babel');
 const gulpImagemin = require('gulp-imagemin');
 const imageminPngquant = require('imagemin-pngquant');
 const imageminJpegRecompress = require('imagemin-jpeg-recompress');
+const server = require('./lib/server');
+
+
+const finish = (done) => (error) => {
+  if (error) {
+    console.error('Error!', error);
+    return;
+  }
+  return done();
+};
+
 
 // Entry point retreive from webpack
 const entry = require('./config/entry');
@@ -46,8 +56,8 @@ const srcPath = (file, watch = false) => {
   return './website/src/copy/**/*';
 };
 const distPath = (file, serve = false, comment = false) => {
-  if (comment) console.log(comment);
-  if (['css', 'js', 'img'].includes(file)) return `./website/dist/${file}`;
+  if (['css', 'js'].includes(file)) return `./website/dist/${file}`;
+  if (file === 'img') return './website/dist/images';
   if (file === 'html') return './website/dist/**/*.html';
   if (file === 'copy') return './website/dist';
   return './website/dist/';
@@ -62,7 +72,7 @@ const cleanMisc = (mode) => () => {
   const cleanTarget = [
     `${distPath('copy')}/**/*`,
     '!./website/dist/css', '!./website/dist/css/**',
-    '!./website/dist/img', '!./website/dist/img/**',
+    '!./website/dist/images', '!./website/dist/images/**',
     '!./website/dist/js', '!./website/dist/js/**',
   ];
   return ['development', 'production'].includes(mode) ? del(cleanTarget) : undefined;
@@ -98,7 +108,7 @@ const buildMisc = (mode) => (done) => {
     gulp.src(srcPath('copy')),
     gulp.dest(distPath('copy')),
     browserSync.stream()
-  ], done) : undefined;
+  ], finish(done)) : undefined;
 };
 
 // Build Images Task
@@ -115,7 +125,7 @@ const buildImages = (mode) => (done) => {
     ]),
     gulp.dest(distPath('img')),
     browserSync.stream(),
-  ], done) : undefined;
+  ], finish(done)) : undefined;
 };
 
 // Build Styles Task
@@ -138,7 +148,7 @@ const buildStyles = (mode) => (done) => {
     gulpSourcemaps.write('./'),
     gulp.dest(distPath('css')),
     browserSync.stream(),
-  ], done) : undefined;
+  ], finish(done)) : undefined;
 };
 
 // Build Scripts Task
@@ -162,7 +172,7 @@ const buildScripts = (mode) => (done) => {
     gulpSourcemaps.write('./'),
     gulp.dest(distPath('js')),
     browserSync.stream(),
-  ], done) : undefined;
+  ], finish(done)) : undefined;
 };
 
 /**
@@ -199,7 +209,8 @@ const genericTask = (mode, context = 'building') => {
 
   // Browser Loading & Watching
   const browserLoadingWatching = (done) => {
-    browserSync.init({ port, server: distPath('copy', true) });
+    server.start();
+    browserSync.init({ port, proxy: `127.0.0.1:${server.port}` });
 
     // Watch - Misc
     gulp.watch(srcPath('copy'), true)
@@ -207,7 +218,6 @@ const genericTask = (mode, context = 'building') => {
         Object.assign(cleanMisc(mode), { displayName: `Watching Misc Task: Clean - ${modeName}` }),
         Object.assign(buildMisc(mode), { displayName: `Watching Misc Task: Build - ${modeName}` }),
       ), browserSync.reload);
-    done();
 
     // Watch - Images
     gulp.watch(srcPath('img', true))
@@ -237,7 +247,7 @@ const genericTask = (mode, context = 'building') => {
       gulp.src(exportPath),
       gulpZip('./website.zip'),
       gulp.dest('./'),
-    ], done);
+    ], finish(done));
   };
 
   // Returning Tasks based on Building Context

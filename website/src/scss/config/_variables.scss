@@ -1,0 +1,14 @@
+$mq-breakpoins: (
+  mobile: 320px,
+  tablet: 768px,
+  desktop: 1200px,
+  large: 1920px
+);
+
+$sm: nth($mq-breakpoins, 'mobile');
+$md: nth($mq-breakpoins, 'tablet');
+$lg: nth($mq-breakpoins, 'desktop');
+$xl: nth($mq-breakpoins, 'large');
+
+@debug 'DEBUG XL:';
+@debug $xl;
