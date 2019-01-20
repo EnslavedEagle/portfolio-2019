@@ -1,0 +1,1 @@
+module.exports = ['pl-PL', 'en-US'];

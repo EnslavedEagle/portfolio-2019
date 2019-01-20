@@ -1,2 +1,16 @@
-<h1>{{ text }}</h1>
-<img src="public/images/fb-image.png" alt="Facebook">
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <title></title>
+  <meta charset="UTF-8">
+  <meta name="author" content="Patryk Bernasiewicz">
+  <meta name="description" content="">
+</head>
+<body>
+
+  <h1>Test</h1>
+
+  {{> header }}
+
+</body>
+</html>

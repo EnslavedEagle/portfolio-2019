@@ -182,7 +182,10 @@ const buildScripts = (mode) => (done) => {
 
 const serverIgnores = [
   'gulpfile.js',
-  '*.json',
+  'package.json',
+  'yarn.lock',
+  'yarn-error.log',
+  '.gitignore',
   'src/assets/**/*',
   'dist/**/*',
   'node_modules/**/*',
@@ -192,7 +195,7 @@ const startServer = (mode) => (done) => {
   nodemon({
     script: 'app.js',
     ext: 'js json mst',
-    ignore: serverIgnores,
+    ignore: serverIgnores
   })
     .on('start', () => {
       console.log('[App] Nodemon started the App.');
@@ -202,11 +205,7 @@ const startServer = (mode) => (done) => {
     })
     .on('restart', () => {
       console.log('[App] App restarted.');
-      setTimeout(function reload() {
-        browserSync.reload({
-          stream: false
-        });
-      }, 2000);
+      setTimeout(() => browserSync.reload(), 200);
     })
     .on('close', () => {
       console.log('[App] App closed.');
