@@ -11,6 +11,9 @@ app.set('views', resolve('src/templates'));
 
 app.use('/static', express.static(resolve('src/assets')));
 
+app.use(require('./src/lib/detect-language'));
+app.use(require('./src/lib/render'));
+
 app.get('/', (req, res) => {
   res.render('index');
 });
