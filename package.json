@@ -7,12 +7,17 @@
   },
   "dependencies": {
     "express": "^4.16.4",
+    "gulp-plumber": "^1.2.1",
+    "gulp-wait": "^0.0.2",
     "mustache": "^3.0.1",
-    "mustache-express": "^1.2.8"
+    "mustache-express": "^1.2.8",
+    "normalize-scss": "^7.0.1",
+    "rfs": "^7.1.9"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.3",
+    "breakpoint-sass": "^2.7.1",
     "browser-sync": "^2.26.3",
     "concurrently": "^4.1.0",
     "del": "^3.0.0",
@@ -25,7 +30,7 @@
     "gulp-live-server": "^0.0.31",
     "gulp-nodemon": "^2.4.2",
     "gulp-postcss": "^8.0.0",
-    "gulp-sass": "^4.0.2",
+    "gulp-sass": "4.0.2",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.1",
     "gulp-zip": "^4.2.0",
@@ -37,7 +42,7 @@
     "sass-mq": "^5.0.0",
     "through2": "^3.0.0",
     "uncss": "^0.16.2",
-    "webpack": "^4.16.5",
+    "webpack": "^4.29.0",
     "webpack-stream": "^5.1.1"
   }
 }

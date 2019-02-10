@@ -1,2 +1,4 @@
-@import 'config/variables';
-@import 'config/vendor';
+@import 'config/all';
+
+@import 'vendor/mq';
+@import 'vendor/rfs';

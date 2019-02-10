@@ -1,0 +1,33 @@
+.floatingLayer {
+    position: fixed;
+    top: calc(10rem + 5vw);
+    left: 0;
+    width: 100%;
+}
+.floatingLayer::before {
+    content: '';
+    display: block;
+}
+.floatingLayer__half {
+    width: 50%;
+}
+
+
+.site-header {
+    min-height: 200vh;
+}
+.site-header__inner {
+}
+.site-header__row {
+    border: 1px solid rgba(#000, .3);
+
+    &::before {
+        content: '';
+        display: block;
+    }
+
+    &::before,
+    & > div {
+        width: 50%;
+    }
+}

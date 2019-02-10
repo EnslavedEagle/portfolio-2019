@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="{{lang}}">
 <head>
-  <title></title>
+  <title>{{site.title}}</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1">
   <meta name="author" content="Patryk Bernasiewicz">
-  <meta name="description" content="">
+  <meta name="description" content="{{site.description}}">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
-  <h1>Test</h1>
+  {{> navbar }}
 
-  {{ hello }}
-
-  {{> header }}
-
+  <script src="assets/js/main.js"></script>
 </body>
 </html>

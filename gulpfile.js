@@ -1,5 +1,7 @@
 // Stolen from https://github.com/IamManchanda/gulp-webpack/
 
+const { resolve } = require('path');
+
 // Node Packages
 const gulp = require('gulp');
 const pump = require('pump');
@@ -13,13 +15,13 @@ const gulpUglify = require('gulp-uglify');
 const gulpSourcemaps = require('gulp-sourcemaps');
 const gulpPostcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
-const postcssUncss = require('postcss-uncss');
 const gulpSass = require('gulp-sass');
 const gulpBabel = require('gulp-babel');
 const gulpImagemin = require('gulp-imagemin');
 const imageminPngquant = require('imagemin-pngquant');
 const imageminJpegRecompress = require('imagemin-jpeg-recompress');
 const nodemon = require('gulp-nodemon');
+const plumber = require('gulp-plumber');
 
 
 const finish = (done) => (error) => {
@@ -133,50 +135,20 @@ const buildImages = (mode) => (done) => {
 };
 
 // Build Styles Task
-const buildStyles = (mode) => (done) => {
-  let outputStyle;
-  if (mode === 'development') outputStyle = 'nested';
-  else if (mode === 'production') outputStyle = 'compressed';
-  else outputStyle = undefined;
+const buildStyles = (mode) => () => {
 
-  const postcssPlugins = [
-    autoprefixer(autoprefixConfig),
-    // postcssUncss({ html: [distPath('html')] }),
-  ];
-  
-  ['development', 'production'].includes(mode) ? pump([
-    gulp.src(srcPath('scss')),
-    gulpSourcemaps.init({ loadMaps: true }),
-    gulpSass({ outputStyle }),
-    gulpPostcss(postcssPlugins),
-    gulpSourcemaps.write('./'),
-    gulp.dest(distPath('css')),
-    browserSync.stream(),
-  ], finish(done)) : undefined;
-};
-
-// Build Scripts Task
-const buildScripts = (mode) => (done) => {
-  let streamMode;
-  if (mode === 'development') streamMode = require('./config/webpack.development.js');
-  else if (mode === 'production') streamMode = require('./config/webpack.production.js');
-  else streamMode = undefined;
-
-  ['development', 'production'].includes(mode) ? pump([
-    gulp.src(srcPath('js')),
-    webpackStream(streamMode, webpack),
-    gulpSourcemaps.init({ loadMaps: true }),
-    through2.obj(function (file, enc, cb) {
-      const isSourceMap = /\.map$/.test(file.path);
-      if (!isSourceMap) this.push(file);
-      cb();
-    }),
-    gulpBabel({ presets: [['@babel/env', babelConfig]] }),
-    ...((mode === 'production') ? [gulpUglify()] : []),
-    gulpSourcemaps.write('./'),
-    gulp.dest(distPath('js')),
-    browserSync.stream(),
-  ], finish(done)) : undefined;
+  return gulp.src('src/assets/scss/style.scss')
+    .pipe(plumber())
+    .pipe(gulpSourcemaps.init('css/maps'))
+    .pipe(gulpSass({
+      includePaths: ['node_modules']
+    }).on('error', gulpSass.logError))
+    .pipe(gulpSourcemaps.write())
+    .pipe(gulpPostcss([
+      autoprefixer(autoprefixConfig)
+    ]))
+    .pipe(gulp.dest('dist/static/css'))
+    .pipe(browserSync.stream());
 };
 
 
@@ -212,6 +184,35 @@ const startServer = (mode) => (done) => {
     });
   done();
 };
+
+
+const buildScripts = (mode) => () => {
+  let streamMode;
+  if (mode === 'development') {
+    streamMode = require('./config/webpack.development.js');
+  } else if (mode === 'production') {
+    streamMode = require('./config/webpack.production.js');
+  } else {
+    streamMode = undefined;
+  }
+
+  return gulp.src('src/assets/js/**/*.js')
+    .pipe(webpackStream(streamMode, webpack))
+    .pipe(gulpSourcemaps.init())
+    .pipe(through2.obj(function(file, enc, cb) {
+      const isSourceMap = /\.map$/.test(file.path);
+      if (!isSourceMap) this.push(file);
+      cb();
+    }))
+    .pipe(gulpBabel({ presets: [['@babel/env', babelConfig]] }))
+    .pipe(gulpUglify())
+    .pipe(gulpSourcemaps.write())
+    .pipe(gulp.dest('dist/static/js'))
+    .pipe(browserSync.stream());
+};
+
+
+
 
 /**
  * Generic Task for all Main Gulp Build/Export Tasks
@@ -250,6 +251,20 @@ const genericTask = (mode, context = 'building') => {
       browser: 'chrome'
     });
 
+
+    // new styles
+    gulp.watch('src/assets/scss/**/*.scss', gulp.series(
+      cleanStyles(mode),
+      buildStyles(mode)
+    ));
+
+    gulp.watch('src/assets/js/**/*.js', gulp.series(
+      cleanScripts(mode),
+      buildScripts(mode)
+    ));
+
+
+
     // Watch - Misc
     gulp.watch(srcPath('misc'), true)
       .on('all', gulp.series(
@@ -264,19 +279,12 @@ const genericTask = (mode, context = 'building') => {
         Object.assign(buildImages(mode), { displayName: `Watching Images Task: Build - ${modeName}` }),
       ), browserSync.reload);
 
-    // Watch - Styles
-    gulp.watch(srcPath('scss', true))
-      .on('all', gulp.series(
-        Object.assign(cleanStyles(mode), { displayName: `Watching Styles Task: Clean - ${modeName}` }),
-        Object.assign(buildStyles(mode), { displayName: `Watching Styles Task: Build - ${modeName}` }),
-      ), browserSync.reload);
-
     // Watch - Scripts
-    gulp.watch(srcPath('js', true))
-      .on('all', gulp.series(
-        Object.assign(cleanScripts(mode), { displayName: `Watching Scripts Task: Clean - ${modeName}` }),
-        Object.assign(buildScripts(mode), { displayName: `Watching Scripts Task: Build - ${modeName}` }),
-      ), browserSync.reload);
+    // gulp.watch(srcPath('js', true))
+    //   .on('all', gulp.series(
+    //     Object.assign(cleanScripts(mode), { displayName: `Watching Scripts Task: Clean - ${modeName}` }),
+    //     Object.assign(buildScripts(mode), { displayName: `Watching Scripts Task: Build - ${modeName}` }),
+    //   ), browserSync.reload);
 
     done();
   };

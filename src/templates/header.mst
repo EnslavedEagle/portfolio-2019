@@ -1,1 +1,20 @@
-<div>This is a div</div>
+
+<div class="floatingLayer">
+  <div class="container">
+    <div class="floatingLayer__half col v-center h-center">
+      <img class="site-header__logo" src="assets/images/logo.svg" alt="{{header.logoAlt}}">
+    </div>
+  </div>
+</div>
+<header id="SiteHeader" class="site-header">
+  <div class="site-header__inner container">
+    <div class="site-header__row col_down row_up">
+      <div class="site-header__intro col v-center">
+        <div class="icol">
+          <h1 class="heading heading--primary">Patryk Bernasiewicz</h1>
+          <div class="heading heading--secondary">Front-End Developer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

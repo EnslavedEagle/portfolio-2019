@@ -1,0 +1,16 @@
+$xs-min: 0;
+$xs-max: 767px;
+$xs: $xs-min $xs-max;
+
+$sm-min: 768px;
+$sm-max: 1199px; 
+$sm: $sm-min $sm-max;
+
+$lg-min: 1200px;
+$lg-max: 1699px;
+$lg: $lg-min $lg-max;
+
+$xl-min: 1700px;
+$xl: $xl-min;
+
+@import 'node_modules/breakpoint-sass/stylesheets/breakpoint';

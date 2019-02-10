@@ -1,0 +1,41 @@
+.hamburger {
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    background: transparent;
+}
+.hamburger svg {
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.site-nav .hamburger__dash {
+    transform-origin: center;
+    transition: transform .55s ease-in-out;
+}
+.site-nav .hamburger__dash--middle {
+    transform-origin: 26.55px 26.9px;
+}
+.site-nav .hamburger__dash--top {
+    transform-origin: 27.05px 16px;
+}
+.site-nav .hamburger__dash--bottom {
+    transform-origin: 26.05px 37.8px;
+}
+
+$rotation: (45 * 5 * 1deg);
+
+.site-nav--expanded .hamburger__dash--top {
+    transform: translateY(21.5%) rotate(#{$rotation});
+}
+.site-nav--expanded .hamburger__dash--bottom {
+    transform: translateY(-21.5%) rotate(#{$rotation * -1});
+}
+.site-nav--expanded .hamburger__dash--middle {
+    transform: rotate(#{$rotation}) scale(0);
+}

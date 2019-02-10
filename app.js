@@ -9,7 +9,7 @@ app.engine('mst', mustacheExpress());
 app.set('view engine', 'mst');
 app.set('views', resolve('src/templates'));
 
-app.use('/static', express.static(resolve('src/assets')));
+app.use('/assets', express.static(resolve('dist/static')));
 
 app.use(require('./src/lib/detect-language'));
 app.use(require('./src/lib/render'));

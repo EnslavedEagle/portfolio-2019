@@ -1,4 +1,22 @@
-body {
-  background: #fff;
-  color: #212121;
+@import 'base';
+
+@import 'vendor/normalize';
+
+* {
+    box-sizing: border-box;
 }
+
+body, html {
+    @include rfs(16);
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: 'Sen', Verdana, Geneva, Tahoma, sans-serif;
+}
+
+@import 'modules/fonts';
+@import 'modules/navbar';
+@import 'modules/framework';
+@import 'modules/header';

@@ -1,6 +1,17 @@
 {
+  "lang": "PL",
   "site": {
     "title": "Patryk Bernasiewicz | Portfolio",
     "description": "Strona-portfolio Patryka Bernasiewicza."
+  },
+  "nav": {
+    "index": "Strona główna",
+    "index-key": "top",
+    "about": "O mnie",
+    "about-key": "o-mnie",
+    "projects": "Projekty",
+    "projects-key": "projekty",
+    "contact": "Kontakt",
+    "contact-key": "kontakt"
   }
 }

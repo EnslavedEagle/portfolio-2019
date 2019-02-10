@@ -1,0 +1,74 @@
+.container {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.flex {
+    display: flex;
+}
+
+.row, .row_up, .row_down,
+.col, .col_up, .col_down {
+    display: flex;
+}
+.irow, .irow_up, .irow_down,
+.icol, .icol_up, .icol_down {
+    display: inline-flex;
+}
+
+.flex.v-center,
+.row.v-center, .irow.v-center,
+.col.h-center, .icol.h-center {
+    align-items: center;
+}
+.flex.h-center,
+.row.h-center, .irow.h-center,
+.col.v-center, .icol.v-center {
+    justify-content: center;
+}
+
+.flex.between,
+.row.between, .irow.between,
+.col.between, .icol.between {
+    justify-content: space-between;
+}
+
+.flex.around,
+.row.around, .irow.around,
+.col.around, .icol.around {
+    justify-content: space-around;
+}
+
+.row, .irow {
+    flex-direction: row;
+}
+.row.reverse, .irow.reverse {
+    flex-direction: row-reverse;
+}
+.col, .icol {
+    flex-direction: column;
+}
+.col.reverse, .icol.reverse {
+    flex-direction: column-reverse;
+}
+
+@include breakpoint(max-width $xs-max) {
+    .col_down, .icol_down {
+        flex-direction: column;
+    }
+    .row_down, .irow_down {
+        flex-direction: row;
+    }
+}
+
+@include breakpoint(min-width $sm-min) {
+    .col_up, .icol_up {
+        flex-direction: column;
+    }
+    .row_up, .irow_up {
+        flex-direction: row;
+    }
+}
